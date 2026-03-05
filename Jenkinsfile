@@ -1,39 +1,23 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "yourdockerhubusername/python-todo-app"
-    }
-
     stages {
 
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/python-todo-app.git'
+                git 'https://github.com/ramkumar-24/CI-CD-pipeline.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
-            }
-        }
-
-        stage('Login to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(
-                credentialsId: 'dockerhub',
-                usernameVariable: 'USER',
-                passwordVariable: 'PASS')]) {
-
-                sh 'echo $PASS | docker login -u $USER --password-stdin'
-                }
+                sh 'docker build -t rex5656/python-todo-app:latest .'
             }
         }
 
         stage('Push Image') {
             steps {
-                sh 'docker push $IMAGE_NAME'
+                sh 'docker push rex5656/python-todo-app:latest'
             }
         }
 
@@ -42,9 +26,11 @@ pipeline {
                 sh '''
                 docker stop python-app || true
                 docker rm python-app || true
-                docker run -d -p 5000:5000 --name python-app $IMAGE_NAME
+                docker pull rex5656/python-todo-app:latest
+                docker run -d -p 5000:5000 --name python-app rex5656/python-todo-app:latest
                 '''
             }
         }
+
     }
 }
